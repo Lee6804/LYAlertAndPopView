@@ -30,6 +30,12 @@
 
 -(void)initialize{
     self.isClickViewDismiss = NO;
+    self.titleColor = [UIColor blackColor];
+    self.titleFontSize = 17.0;
+    self.messageColor = [UIColor lightGrayColor];
+    self.messageFontSize = 14.0;
+    self.confirmBtnColor = [UIColor redColor];
+    self.cancelBtnColor = [UIColor lightGrayColor];
 }
 
 -(instancetype)initWithTitle:(NSString *)title message:(NSString *)message cancelBtnTitle:(NSString *)cancelTitle otherBtnTitle:(NSString *)otherBtnTitle clickIndexBlock:(AlertClickIndexBlock)block{
@@ -65,7 +71,7 @@
     }
     
     UILabel *messageLabel = [[UILabel alloc] init];
-    messageLabel.frame = CGRectMake(Margin, _titleLab.frame.size.height+_titleLab.frame.origin.y+8, AVWidth - Margin*2, [self getSize:Margin*2 str:message].size.height);
+    messageLabel.frame = CGRectMake(Margin, CGRectGetMaxY(self.titleLab.frame)+8, AVWidth - Margin*2, [self getSize:Margin*2 str:message].size.height);
     messageLabel.backgroundColor = [UIColor whiteColor];
     messageLabel.text = message;
     messageLabel.textColor = [UIColor lightGrayColor];
@@ -75,7 +81,7 @@
     self.messageLab = messageLabel;
     
     //计算alertView的高度
-    self.alertView.frame = CGRectMake(0, 0, AVWidth, self.messageLab.frame.origin.y + self.messageLab.frame.size.height + 20 + BtnHeight);
+    self.alertView.frame = CGRectMake(0, 0, AVWidth, CGRectGetMaxY(self.messageLab.frame) + 20 + BtnHeight);
     self.alertView.center = self.center;
     [self addSubview:self.alertView];
     
@@ -109,7 +115,7 @@
     }
     
     CGFloat btnLeftSpace = Margin;//btn到左边距
-    CGFloat btn_y = _alertView.frame.size.height - 10 - BtnHeight;
+    CGFloat btn_y = CGRectGetHeight(self.alertView.frame) - 10 - BtnHeight;
     
     if (cancelTitle && !otherBtnTitle) {
         
@@ -129,7 +135,7 @@
         
         CGFloat btn_w =(AVWidth-btnLeftSpace*2-btnSpace)/2;
         self.cancelBtn.frame = CGRectMake(btnLeftSpace, btn_y, btn_w, BtnHeight);
-        self.otherBtn.frame = CGRectMake(_alertView.frame.size.width-btn_w-btnLeftSpace, btn_y, btn_w, BtnHeight);
+        self.otherBtn.frame = CGRectMake(CGRectGetWidth(self.alertView.frame)-btn_w-btnLeftSpace, btn_y, btn_w, BtnHeight);
     }
     
     self.clickBlock=block;
@@ -141,11 +147,21 @@
     [self dismissAlertView];
 }
 
--(void)showAlertView{
-    
+-(void)alertViewChangeAttribute{
     if (self.isClickViewDismiss) {
         [self addGestureRecognizer:[[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(dismissAlertView)]];
     }
+    self.titleLab.textColor = self.titleColor;
+    self.titleLab.font = [UIFont systemFontOfSize:self.titleFontSize];
+    self.messageLab.textColor = self.messageColor;
+    self.messageLab.font = [UIFont systemFontOfSize:self.messageFontSize];
+    self.otherBtn.backgroundColor = self.confirmBtnColor;
+    self.cancelBtn.backgroundColor = self.cancelBtnColor;
+}
+
+-(void)showAlertView{
+    
+    [self alertViewChangeAttribute];
     
     UIWindow *alertWindow = [[UIWindow alloc] initWithFrame:MainScreenRect];
     alertWindow.windowLevel=UIWindowLevelAlert;
@@ -285,12 +301,37 @@
     return labelSize;
 }
 
+#pragma mark - setter
 -(void)setAnimationStyle:(ShowAnimationStyle)animationStyle{
     _animationStyle=animationStyle;
 }
 
 -(void)setIsClickViewDismiss:(BOOL)isClickViewDismiss{
     _isClickViewDismiss = isClickViewDismiss;
+}
+
+-(void)setTitleColor:(UIColor *)titleColor{
+    _titleColor = titleColor;
+}
+
+-(void)setTitleFontSize:(CGFloat)titleFontSize{
+    _titleFontSize = titleFontSize;
+}
+
+-(void)setMessageColor:(UIColor *)messageColor{
+    _messageColor = messageColor;
+}
+
+-(void)setMessageFontSize:(CGFloat)messageFontSize{
+    _messageFontSize = messageFontSize;
+}
+
+-(void)setConfirmBtnColor:(UIColor *)confirmBtnColor{
+    _confirmBtnColor = confirmBtnColor;
+}
+
+-(void)setCancelBtnColor:(UIColor *)cancelBtnColor{
+    _cancelBtnColor = cancelBtnColor;
 }
 
 /*

@@ -22,6 +22,7 @@
 
 @interface LYPopView()
 
+@property(nonatomic,strong)NSDictionary *materialDic;
 @property(nonatomic,strong)UIWindow *popWindow;
 @property(nonatomic,strong)UIView *otherClearView;
 @property(nonatomic,strong)UIView *popView;
@@ -51,6 +52,8 @@
 
 -(void)setupUIWithDic:(NSDictionary *)infoDic{
     
+    self.materialDic = infoDic;
+    
     self.frame = MainScreenRect;
     self.backgroundColor = [UIColor colorWithWhite:.3 alpha:.7];
     
@@ -72,10 +75,12 @@
     headImg.layer.borderWidth = 0.5;
     headImg.contentMode = UIViewContentModeScaleAspectFill;
     headImg.image = [UIImage imageNamed:[infoDic objectForKey:@"headImgUrl"]];
+    headImg.userInteractionEnabled = YES;
+    [headImg addGestureRecognizer:[[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(headTapClick)]];
     self.headImg = headImg;
     [self.popView addSubview:self.headImg];
     
-    UILabel *nameLabel = [[UILabel alloc] initWithFrame:CGRectMake(16, self.headImg.frame.origin.y + self.headImg.frame.size.height + 20, MainWidth - 32, 20)];
+    UILabel *nameLabel = [[UILabel alloc] initWithFrame:CGRectMake(16, CGRectGetMaxY(self.headImg.frame) + 20, MainWidth - 32, 20)];
     nameLabel.text = [infoDic objectForKey:@"name"];
     nameLabel.font = [UIFont boldSystemFontOfSize:17];
     nameLabel.textColor = [UIColor blackColor];
@@ -83,12 +88,12 @@
     self.nameLabel = nameLabel;
     [self.popView addSubview:self.nameLabel];
     
-    UIView *littleLineView = [[UIView alloc] initWithFrame:CGRectMake(MainWidth/2 - 0.5, self.nameLabel.frame.origin.y + self.nameLabel.frame.size.height + 25, 1, 10)];
+    UIView *littleLineView = [[UIView alloc] initWithFrame:CGRectMake(MainWidth/2 - 0.5, CGRectGetMaxY(self.nameLabel.frame) + 25, 1, 10)];
     littleLineView.backgroundColor = [UIColor colorWithRed:193.0/255.0 green:192.0/255.0 blue:197.0/255.0 alpha:1];
     self.littleLineView = littleLineView;
     [self.popView addSubview:self.littleLineView];
     
-    UILabel *fansLabel = [[UILabel alloc] initWithFrame:CGRectMake(16, self.nameLabel.frame.origin.y + self.nameLabel.frame.size.height + 20, MainWidth/2 - 36, 20)];
+    UILabel *fansLabel = [[UILabel alloc] initWithFrame:CGRectMake(16, CGRectGetMaxY(self.nameLabel.frame) + 20, MainWidth/2 - 36, 20)];
     fansLabel.text = [NSString stringWithFormat:@"粉丝数：%@",[infoDic objectForKey:@"fansNum"]];
     fansLabel.font = [UIFont systemFontOfSize:13];
     fansLabel.textColor = [UIColor lightGrayColor];
@@ -96,15 +101,15 @@
     self.fansLabel = fansLabel;
     [self.popView addSubview:self.fansLabel];
     
-    UILabel *userIDLabel = [[UILabel alloc] initWithFrame:CGRectMake(MainWidth/2 + 20, self.nameLabel.frame.origin.y + self.nameLabel.frame.size.height + 20, MainWidth/2 - 36, 20)];
-    userIDLabel.text = [NSString stringWithFormat:@"主播ID：%@",[infoDic objectForKey:@"userId"]];
+    UILabel *userIDLabel = [[UILabel alloc] initWithFrame:CGRectMake(MainWidth/2 + 20, CGRectGetMaxY(self.nameLabel.frame) + 20, MainWidth/2 - 36, 20)];
+    userIDLabel.text = [NSString stringWithFormat:@"ID：%@",[infoDic objectForKey:@"userId"]];
     userIDLabel.font = [UIFont systemFontOfSize:13];
     userIDLabel.textColor = [UIColor lightGrayColor];
     userIDLabel.textAlignment = NSTextAlignmentLeft;
     self.userIDLabel = userIDLabel;
     [self.popView addSubview:self.userIDLabel];
     
-    UILabel *signLabel = [[UILabel alloc] initWithFrame:CGRectMake(16, self.fansLabel.frame.origin.y + self.fansLabel.frame.size.height + 20, MainWidth - 32, 20)];
+    UILabel *signLabel = [[UILabel alloc] initWithFrame:CGRectMake(16, CGRectGetMaxY(self.fansLabel.frame) + 20, MainWidth - 32, 20)];
     signLabel.text = [infoDic objectForKey:@"sign"];
     signLabel.font = [UIFont systemFontOfSize:15];
     signLabel.textColor = [UIColor lightGrayColor];
@@ -112,19 +117,32 @@
     self.signLabel = signLabel;
     [self.popView addSubview:self.signLabel];
     
-    UIView *grayLineView = [[UIView alloc] initWithFrame:CGRectMake(0, self.signLabel.frame.origin.y + self.signLabel.frame.size.height + 20, MainWidth, 0.5)];
+    UIView *grayLineView = [[UIView alloc] initWithFrame:CGRectMake(0, CGRectGetMaxY(self.signLabel.frame) + 20, MainWidth, 0.5)];
     grayLineView.backgroundColor = BorderColor;
     self.grayLineView = grayLineView;
     [self.popView addSubview:self.grayLineView];
     
     UIButton *followBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-    followBtn.frame = CGRectMake(8, self.grayLineView.frame.origin.y + self.grayLineView.frame.size.height + 5, MainWidth - 16, 40);
+    followBtn.frame = CGRectMake(8, CGRectGetMaxY(self.grayLineView.frame) + 5, MainWidth - 16, 40);
     [followBtn setTitle:@"+ 关注" forState:UIControlStateNormal];
+    [followBtn setTitle:@"- 已关注" forState:UIControlStateSelected];
     [followBtn setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
+    [followBtn setTitleColor:[UIColor darkGrayColor] forState:UIControlStateSelected];
     followBtn.titleLabel.font = [UIFont boldSystemFontOfSize:15];
+    [followBtn addTarget:self action:@selector(followBtnClick:) forControlEvents:UIControlEventTouchUpInside];
     self.followBtn = followBtn;
     [self.popView addSubview:self.followBtn];
     
+}
+
+-(void)headTapClick{
+    if (self.materialDic) {
+        !_userMaterialBlock ? : _userMaterialBlock([self.materialDic objectForKey:@"userId"]);
+    }
+}
+
+-(void)followBtnClick:(UIButton *)btn{
+    btn.selected = !btn.selected;
 }
 
 -(void)showPopView{

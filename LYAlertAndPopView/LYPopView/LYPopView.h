@@ -13,9 +13,13 @@ typedef NS_ENUM(NSInteger , ShowPopViewDirection) {
     popViewDirectionTop        ,
 };
 
+typedef void (^userMaterialBlock)(NSString *userId);
+
 @interface LYPopView : UIView
 
 @property(nonatomic,assign)ShowPopViewDirection popViewDirection;
+
+@property(nonatomic,copy)userMaterialBlock userMaterialBlock;
 
 -(instancetype)initWithDic:(NSDictionary *)infoDic;
 
