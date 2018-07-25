@@ -32,8 +32,9 @@ typedef void(^AlertClickIndexBlock)(NSInteger clickIndex);
 @property(nonatomic,strong)UIColor *messageColor;//内容字体颜色
 @property(nonatomic,strong)UIColor *confirmBtnColor;//确定按钮颜色
 @property(nonatomic,strong)UIColor *cancelBtnColor;//取消按钮颜色
+@property(nonatomic,assign)NSTextAlignment contentTextAlignment;//内容字体位置
 
--(instancetype)initWithTitle:(NSString *)title message:(NSString *)message cancelBtnTitle:(NSString *)cancelTitle otherBtnTitle:(NSString *)otherBtnTitle clickIndexBlock:(AlertClickIndexBlock)block;
+-(instancetype)initWithTitle:(NSString *)title message:(NSString *)message cancelBtnTitle:(NSString *)cancelTitle otherBtnTitle:(NSString *)otherBtnTitle alertWidth:(CGFloat)aWidth clickIndexBlock:(AlertClickIndexBlock)block;
 
 -(void)showAlertView;
 

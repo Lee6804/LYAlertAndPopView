@@ -10,7 +10,6 @@
 
 #define MainScreenRect [UIScreen mainScreen].bounds
 #define MainWidth [UIScreen mainScreen].bounds.size.width
-#define AVWidth (MainWidth - 120.0f)
 
 #define Margin 16//边距
 #define BtnHeight 40//btn的高度
@@ -24,6 +23,8 @@
 @property (nonatomic,strong)UIButton *cancelBtn;
 @property (nonatomic,strong)UIButton *otherBtn;
 
+@property(nonatomic,assign)CGFloat aWidth;//alertView宽度
+
 @end
 
 @implementation LYAlertView
@@ -36,21 +37,24 @@
     self.messageFontSize = 14.0;
     self.confirmBtnColor = [UIColor redColor];
     self.cancelBtnColor = [UIColor lightGrayColor];
+    self.contentTextAlignment = NSTextAlignmentCenter;
 }
 
--(instancetype)initWithTitle:(NSString *)title message:(NSString *)message cancelBtnTitle:(NSString *)cancelTitle otherBtnTitle:(NSString *)otherBtnTitle clickIndexBlock:(AlertClickIndexBlock)block{
+-(instancetype)initWithTitle:(NSString *)title message:(NSString *)message cancelBtnTitle:(NSString *)cancelTitle otherBtnTitle:(NSString *)otherBtnTitle alertWidth:(CGFloat)aWidth clickIndexBlock:(AlertClickIndexBlock)block{
     
     self = [super init];
     if(self){
         
         [self initialize];
         
-        [self setupUIWithTitle:(NSString *)title message:(NSString *)message cancelBtnTitle:(NSString *)cancelTitle otherBtnTitle:(NSString *)otherBtnTitle clickIndexBlock:(AlertClickIndexBlock)block];
+        [self setupUIWithTitle:(NSString *)title message:(NSString *)message cancelBtnTitle:(NSString *)cancelTitle otherBtnTitle:(NSString *)otherBtnTitle alertWidth:(CGFloat)aWidth clickIndexBlock:(AlertClickIndexBlock)block];
     }
     return self;
 }
 
--(void)setupUIWithTitle:(NSString *)title message:(NSString *)message cancelBtnTitle:(NSString *)cancelTitle otherBtnTitle:(NSString *)otherBtnTitle clickIndexBlock:(AlertClickIndexBlock)block{
+-(void)setupUIWithTitle:(NSString *)title message:(NSString *)message cancelBtnTitle:(NSString *)cancelTitle otherBtnTitle:(NSString *)otherBtnTitle alertWidth:(CGFloat)aWidth clickIndexBlock:(AlertClickIndexBlock)block{
+    
+    self.aWidth = aWidth;
     
     self.backgroundColor = [UIColor colorWithWhite:.3 alpha:.7];
     self.frame = MainScreenRect;
@@ -62,7 +66,7 @@
     self.alertView = alertView;
     
     if (title) {
-        UILabel *titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(Margin, Margin, AVWidth - Margin*2, 20)];
+        UILabel *titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(Margin, Margin, aWidth - Margin*2, 20)];
         titleLabel.text = title;
         titleLabel.textAlignment = NSTextAlignmentCenter;
         titleLabel.textColor = [UIColor blackColor];
@@ -71,7 +75,7 @@
     }
     
     UILabel *messageLabel = [[UILabel alloc] init];
-    messageLabel.frame = CGRectMake(Margin, CGRectGetMaxY(self.titleLab.frame)+8, AVWidth - Margin*2, [self getSize:Margin*2 str:message].size.height);
+    messageLabel.frame = CGRectMake(Margin, CGRectGetMaxY(self.titleLab.frame)+8, aWidth - Margin*2, [self getSize:Margin*2 str:message].size.height);
     messageLabel.backgroundColor = [UIColor whiteColor];
     messageLabel.text = message;
     messageLabel.textColor = [UIColor lightGrayColor];
@@ -81,7 +85,7 @@
     self.messageLab = messageLabel;
     
     //计算alertView的高度
-    self.alertView.frame = CGRectMake(0, 0, AVWidth, CGRectGetMaxY(self.messageLab.frame) + 20 + BtnHeight);
+    self.alertView.frame = CGRectMake(0, 0, aWidth, CGRectGetMaxY(self.messageLab.frame) + 20 + BtnHeight);
     self.alertView.center = self.center;
     [self addSubview:self.alertView];
     
@@ -120,12 +124,12 @@
     if (cancelTitle && !otherBtnTitle) {
         
         self.cancelBtn.tag = 0;
-        self.cancelBtn.frame = CGRectMake(btnLeftSpace, btn_y, AVWidth-btnLeftSpace*2, BtnHeight);
+        self.cancelBtn.frame = CGRectMake(btnLeftSpace, btn_y, aWidth - btnLeftSpace*2, BtnHeight);
         
     }else if (!cancelTitle && otherBtnTitle){
         
         self.otherBtn.tag=0;
-        self.otherBtn.frame=CGRectMake(btnLeftSpace, btn_y, AVWidth-btnLeftSpace*2, BtnHeight);
+        self.otherBtn.frame=CGRectMake(btnLeftSpace, btn_y, aWidth - btnLeftSpace*2, BtnHeight);
         
     }else if (cancelTitle && otherBtnTitle){
         
@@ -133,7 +137,7 @@
         self.otherBtn.tag = 1;
         CGFloat btnSpace = Margin;//两个btn之间的间距
         
-        CGFloat btn_w =(AVWidth-btnLeftSpace*2-btnSpace)/2;
+        CGFloat btn_w =(aWidth - btnLeftSpace*2-btnSpace)/2;
         self.cancelBtn.frame = CGRectMake(btnLeftSpace, btn_y, btn_w, BtnHeight);
         self.otherBtn.frame = CGRectMake(CGRectGetWidth(self.alertView.frame)-btn_w-btnLeftSpace, btn_y, btn_w, BtnHeight);
     }
@@ -155,6 +159,7 @@
     self.titleLab.font = [UIFont systemFontOfSize:self.titleFontSize];
     self.messageLab.textColor = self.messageColor;
     self.messageLab.font = [UIFont systemFontOfSize:self.messageFontSize];
+    self.messageLab.textAlignment = self.contentTextAlignment;
     self.otherBtn.backgroundColor = self.confirmBtnColor;
     self.cancelBtn.backgroundColor = self.cancelBtnColor;
 }
@@ -227,7 +232,7 @@
             
         case AnimationLeftShake:{
             
-            CGPoint startPoint = CGPointMake(-AVWidth, self.center.y);
+            CGPoint startPoint = CGPointMake(-self.aWidth, self.center.y);
             self.alertView.layer.position=startPoint;
             //damping:阻尼，范围0-1，阻尼越接近于0，弹性效果越明显
             //velocity:弹性复位的速度
@@ -243,7 +248,7 @@
             
         case AnimationRightShake:{
             
-            CGPoint startPoint = CGPointMake(AVWidth*2, self.center.y);
+            CGPoint startPoint = CGPointMake(self.aWidth*2, self.center.y);
             self.alertView.layer.position=startPoint;
             
             [UIView animateWithDuration:.8 delay:0 usingSpringWithDamping:.5 initialSpringVelocity:1.0 options:UIViewAnimationOptionCurveEaseIn animations:^{
@@ -297,7 +302,7 @@
 }
 
 - (CGRect)getSize:(CGFloat)lessWidth str:(NSString *)str{
-    CGRect labelSize = [str boundingRectWithSize:CGSizeMake(AVWidth-lessWidth, CGFLOAT_MAX) options:NSStringDrawingUsesLineFragmentOrigin attributes:[NSDictionary dictionaryWithObjectsAndKeys:[UIFont systemFontOfSize:15],NSFontAttributeName, nil] context:nil];
+    CGRect labelSize = [str boundingRectWithSize:CGSizeMake(self.aWidth-lessWidth, CGFLOAT_MAX) options:NSStringDrawingUsesLineFragmentOrigin attributes:[NSDictionary dictionaryWithObjectsAndKeys:[UIFont systemFontOfSize:15],NSFontAttributeName, nil] context:nil];
     return labelSize;
 }
 
@@ -332,6 +337,10 @@
 
 -(void)setCancelBtnColor:(UIColor *)cancelBtnColor{
     _cancelBtnColor = cancelBtnColor;
+}
+
+-(void)setContentTextAlignment:(NSTextAlignment)contentTextAlignment{
+    _contentTextAlignment = contentTextAlignment;
 }
 
 /*

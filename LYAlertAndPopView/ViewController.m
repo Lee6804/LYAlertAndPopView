@@ -73,7 +73,7 @@
 
 - (void)clickButton:(UIButton*)sender {
     
-    LYAlertView *alert = [[LYAlertView alloc] initWithTitle:sender.titleLabel.text message:@"缘起是诗，缘离是画，这些关于岁月，关于记忆的章节，终会被时光搁置在无法触及的红尘之外，曾经，你我一别经年，可风里，总有一段美丽会与我们不期而遇，一盏琉璃，半杯心悦，端然着那一份醉人的静，这安静行走的流年，总会被过往赋予一份清喜，一份浪漫。" cancelBtnTitle:@"取消" otherBtnTitle:@"确定" clickIndexBlock:^(NSInteger clickIndex) {
+    LYAlertView *alert = [[LYAlertView alloc] initWithTitle:sender.titleLabel.text message:@"缘起是诗，缘离是画，这些关于岁月，关于记忆的章节，终会被时光搁置在无法触及的红尘之外，曾经，你我一别经年，可风里，总有一段美丽会与我们不期而遇，一盏琉璃，半杯心悦，端然着那一份醉人的静，这安静行走的流年，总会被过往赋予一份清喜，一份浪漫。" cancelBtnTitle:@"取消" otherBtnTitle:@"确定" alertWidth:klScreenWidth - 120.0f clickIndexBlock:^(NSInteger clickIndex) {
         NSLog(@"点击AlertView ==== %ld",clickIndex);
     }];
     
